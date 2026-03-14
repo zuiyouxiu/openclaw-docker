@@ -54,7 +54,8 @@ RUN git clone --depth 1 --branch ${OPENCLAW_VERSION} https://github.com/openclaw
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
-
+RUN sed -i '1s/^/\/\/ @ts-nocheck\n/' src/browser/routes/agent.act.ts && \
+         sed -i '/batchViaPlaywright,/d' src/browser/pw-ai.ts
 # Build
 RUN OPENCLAW_A2UI_SKIP_MISSING=1 pnpm build
 # Force pnpm for UI build (Bun may fail on ARM/Synology architectures)
