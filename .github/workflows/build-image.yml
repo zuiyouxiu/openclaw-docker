@@ -45,17 +45,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,prefix={{branch}}-
-            type=ref,event=branch
-            type=schedule,pattern={{date 'YYYYMMDD'}}
-
       - name: Determine OpenClaw version
         id: version
         run: |
@@ -66,6 +55,15 @@ jobs:
           fi
           echo "openclaw_version=${VERSION}" >> $GITHUB_OUTPUT
           echo "Building with OpenClaw version: ${VERSION}"
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ steps.version.outputs.openclaw_version }}
+            type=raw,value=latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
